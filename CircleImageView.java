@@ -13,6 +13,10 @@ import android.view.View;
 import com.example.william.customview.widget.tool.BitmapHelper;
 import com.example.william.customview.R;
 
+/**
+ * 圆形图片View。
+ * TODO:1. 有点锯齿。 2. 没有设置padding，导致padding在LayoutParams中无效。
+ */
 public class CircleImageView extends View {
     public CircleImageView(Context context) {
         this(context, null);
@@ -25,30 +29,68 @@ public class CircleImageView extends View {
     public CircleImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        init();
+        initPaint();
     }
 
-    private Bitmap mBitmap;
-    private Paint mPaint;
-    private Path mPath;
+    private void setPath() {
+        mPath.reset();
+        mPath.addCircle(w / 2, h / 2, w / 2, Path.Direction.CCW);
+    }
 
-    private void init() {
+    private void initPaint() {
         setLayerType(LAYER_TYPE_SOFTWARE, mPaint);
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        mBitmap = BitmapHelper.decodeBitmapFromResource(getResources(), R.drawable.aaa, 200, 200);
-        mPaint = new Paint();
-        mPath = new Path();
+        mPaint.setAntiAlias(true);
+    }
 
-        int width = mBitmap.getWidth();
-        int height = mBitmap.getHeight();
-        mPath.addCircle(width / 2, height / 2, width / 2, Path.Direction.CCW);
+
+    private Bitmap mBitmap;
+    private Paint mPaint = new Paint();
+    private Path mPath = new Path();
+    private int w;
+    private int h;
+    private int bitmapW = 0;
+    private int bitmapH = 0;
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int ws = MeasureSpec.getSize(widthMeasureSpec);
+        int hs = MeasureSpec.getSize(heightMeasureSpec);
+        int wm = MeasureSpec.getMode(widthMeasureSpec);
+        int hm = MeasureSpec.getMode(heightMeasureSpec);
+        //如果子view是wrap_content，那么view就设置成bitmap的大小。
+        if (wm == MeasureSpec.AT_MOST) {
+            ws = bitmapW;
+        }
+        if (hm == MeasureSpec.AT_MOST) {
+            hs = bitmapH;
+        }
+        int resultW = MeasureSpec.makeMeasureSpec(ws, wm);
+        int resultH = MeasureSpec.makeMeasureSpec(hs, hm);
+
+        super.onMeasure(resultW, resultH);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        this.w = w;
+        this.h = h;
+        setPath();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.save();
+        if (mBitmap==null){
+            return;
+        }
         canvas.clipPath(mPath);
         canvas.drawBitmap(mBitmap, 0, 0, mPaint);
-        canvas.restore();
+    }
+
+    public void setImage(Bitmap bitmap) {
+        mBitmap = bitmap;
+        bitmapH = mBitmap.getHeight();
+        bitmapW = mBitmap.getWidth();
+
+        requestLayout();
     }
 }
