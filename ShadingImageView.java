@@ -15,16 +15,16 @@ import android.view.View;
 
 import com.example.william.customview.R;
 
-public class ClipRgnView extends View {
-    public ClipRgnView(Context context) {
+public class ShadingImageView extends View {
+    public ShadingImageView(Context context) {
         this(context, null);
     }
 
-    public ClipRgnView(Context context, @Nullable AttributeSet attrs) {
+    public ShadingImageView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public ClipRgnView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ShadingImageView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         init();
@@ -53,9 +53,6 @@ public class ClipRgnView extends View {
         mClipHeight = sDEFAULT_CLIP_HEIGHT;
         mSpeed = sDEFAULT_SPEED;
 
-        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.aaa);
-        height = mBitmap.getHeight();
-        width = mBitmap.getWidth();
         mRgn = new Region();
 
         left = new Rect();
@@ -66,6 +63,9 @@ public class ClipRgnView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
+        if (mBitmap == null) {
+            return;
+        }
         mRgn.setEmpty();
         mPath.reset();
         int count = 0;
@@ -102,6 +102,14 @@ public class ClipRgnView extends View {
 
         public void setClipHeight(@IntRange(from = 0) int clipHeight) {
             mClipHeight = clipHeight;
+        }
+
+        public void setBitmap(Bitmap bitmap) {
+            mBitmap = bitmap;
+            height = bitmap.getHeight();
+            width = bitmap.getWidth();
+
+            invalidate();
         }
     }
 }
