@@ -15,6 +15,10 @@ public class EasyAnim {
     private static final int sDEFAULT_SECOND_DURATION = 300;
     private static final float sZoomRatio = 1.2f;
 
+    /**
+     * 弹性点击
+     * @param target 目标view
+     */
     public static void elasticAnim(final View target) {
         elasticAnim(target, sZoomRatio, sDEFAULT_FIRST_DURATION, sDEFAULT_SECOND_DURATION);
     }
